@@ -1,0 +1,158 @@
+<!DOCTYPE html>
+<html lang="en">
+    <head>
+        <meta charset="UTF-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1">
+        <title>HarvestGuard Rwanda</title>
+        <meta name="description" content="Maize post-harvest storage and loss tracking for smallholder farmers in Rwanda.">
+        <link rel="icon" href="favicon.svg" type="image/svg+xml">
+        <link rel="stylesheet" href="css/style.css">
+    </head>
+    <body>
+        <a class="skip" href="#main">Skip to content</a>
+
+        <header class="site-header">
+            <div class="container header-row">
+                <div>
+                    <p class="brand">HarvestGuard <span>Rwanda</span></p>
+                    <p class="tagline">Protect every harvest. Track every loss.</p>
+                    <p class="farm" id="farm-name"></p>
+                </div>
+                <button type="button" class="btn light" id="logout" hidden>Log out</button>
+            </div>
+            <nav class="container nav" id="nav" aria-label="Main" hidden>
+                <a href="#/">Dashboard</a>
+                <a href="#/batches">Batches</a>
+                <a href="#/storage">Storage</a>
+                <a href="#/reports">Reports</a>
+            </nav>
+        </header>
+
+        <main class="container" id="main" tabindex="-1">
+            <section id="auth" class="auth" hidden>
+                <h1 class="visually-hidden">Log in to HarvestGuard Rwanda</h1>
+                <div class="card">
+                    <h2 id="login-title">Log in</h2>
+                    <form id="login-form" class="stack" aria-labelledby="login-title">
+                        <div class="field"><label for="login-email">Email</label></div>
+                        <div class="field"><label for="login-password">Password</label></div>
+                        <p class="error" role="alert" data-error></p>
+                        <button class="btn" type="submit">Log in</button>
+                    </form>
+                    <p class="muted">New here? <button type="button" class="link" data-action="show-register">Create an account</button></p>
+                </div>
+
+                <div class="card" id="register-card" hidden>
+                    <h2 id="register-title">Create Account</h2>
+                    <form id="register-form" class="stack" aria-labelledby="register-title">
+                        <div class="field"><label for="reg-name">Your name</label><input id="reg-name" name="name" autocomplete="name" required maxlength="100"></div>
+                        <div class="field"><label for="reg-email">Email</label><input id="reg-mail" name="email" type="email" autocomplete="email" required></div>
+                        <div class="field"><label for="reg-password">Password</label><input id="reg-password" name="password" type="password" autocomplete="new-password" minlength="8" required><small>At least 8 characters.</small></div>
+                        <div class="field"><label for="reg-farm">Farm name</label><input id="farm" name="farm_name" required maxlength="100"></div>
+                        <div class="field"><label for="reg-district">District</label><input id="reg-distrivt" name="district" required maxlength="100"></div>
+                        <div class="field"><label for="reg-lat">Farm latitude</label><input id="reg-lat" name="latitude" type="number" step="any" value="-1.9441" required></div>
+                        <div class="field"><label for="reg-lon">Farm longitude</label><input id="reg-lon" name="longitude" type="number" step="any" value="30.0619" required>
+                        <small>Used for your weather forecast. The default is kigali: change it or press the button.</small></div>
+                        <button type="button" class="btn secondary" data-action="locate">Use my location</button>
+                        <p class="error" role="alert" data-error></p>
+                        <button class="btn" type="submit">Create account</button>
+                    </form>
+                </div>
+            </section>
+
+            <div id="view-dashboard" class="view dashboard" hidden>
+                <h1 class="visually-hidden">Dashboard</h1>
+                <section class="card card-full" aria-labelledby="summary-title">
+                    <h2 id="summary-title">Summary of active batches</h2>
+                    <div class="stats" id="stats"></div>
+                </section>
+
+                <section class="card" aria-labelledby="alerts-title">
+                    <h2 id="alerts-title">Alerts</h2>
+                    <ul class="alerts" id="alerts" aria-live="polite"><li>Loading...</li></ul>
+                </section>
+
+                <section class="card" aria-labelledby="weather-title">
+                    <h2 id="weather-title">Weather &amp; drying</h2>
+                    <div id="weather" aria-live="polite">Loading forecast...</div>
+                </section>
+
+                <section class="card" aria-labelledby="storage-title">
+                    <h2 id="storage-title">Maize in storage</h2>
+                    <ul class="batches" id="batches"></ul>
+                </section>
+
+                <section class="card" aria-labelledby="drying-title">
+                    <h2 id="drying-title">Drying progress</h2>
+                    <ul class="muted" id="drying-advice"></ul>
+                </section>
+
+                <section class="card" aria-labelledby="places-title">
+                    <h2 id="places-title">Storage overview</h2>
+                    <ul class="bars" id="places"></ul>
+                </section>
+
+                <section class="card" aria-labelledby="activity-title">
+                    <h2 id="activity-title">Recent activity</h2>
+                    <ul class="batches" id="activity"></ul>  
+                </section>
+
+                <section class="card card-wide" aria-labelledby="losses-title">
+                    <h2 id="losses-title">Lossees by cause</h2>
+                    <ul class="bars" id="losses"></ul>
+                </section>
+
+                <section class="card" aria-labelledby="actions-title">
+                    <h2 id="actions-title">Record</h2>
+                    <div class="actions">
+                        <button type="button" class="btn" data-action="harvest">+ Record harvest</button>
+                        <button type="button" class="btn" data-action="loss">+ Record loss</button>
+                        <button type="button" class="btn secondary" data-action="movement">Sale, household use or transfer</button>
+                        <button type="button" class="btn secondary" data-action="drying">+ Record drying</button>
+                        <button type="button" class="btn secondary" data-action="inspect">+ Record inspection</button>
+                    </div>
+                </section>
+            </div>
+
+            <div id="view-batches" class="view" hidden>
+                <div class="toolbar">
+                    <h1>Batches</h1>
+                    <button type="button" class="btn" data-action="harvest">+ Record harvest</button>
+                </div>
+                <form class="card filters" id="filters" role="search" aria-label="Filter batches">
+                    <div class="field"><label for="f-search">Search</label><input id="f-search" type="search" placeholder="Code, season or location"></div>
+                    <div class="field"><label for="f-status">Show</label>
+                    <select id="f-status" name="status"><option value="active">Active</option><option value="archived">Archived</option><option value="all">All</option></select></div>
+                </form>
+                <div class="card" id="batch-list" aria-live="polite">Loading...</div>
+            </div>
+
+            <div id="view-batch" class="view" hidden><div id="batch-detail" aria-live="polite">Loading...</div>
+
+            <div id="view-reports" class="view" hidden>
+                <h1>Reports</h1>
+                <div id="report" aria-live="polite">Loading...</div>
+            </div>
+        </main>
+
+        <dialog id="form-dialog" aria-labelledby="form-title">
+            <form id="dialog-form" class="stack" method="dialog">
+                <h2 id="form-title"></h2>
+                <div id="form-fileds" class="stack"></div>
+                <p class="error" role="alert" id="form-error"></p>
+                <div class="row">
+                    <button type="submit" class="btn" id="form-save">Save</button>
+                    <button type="button" class="btn secondary" data-action="close-dialog">Cancel</button>
+                </div>
+            </form>
+        </dialog>
+
+        <div id="toast" class="toast" role="status" aria-live="polite"></div>
+
+        <footer class="site-footer container">
+            <p Weather data by <a href="https://opne-meteo.com">Open-Meteo.com</a>. Forecasts do not measure the moisture of your grain.</p>
+        </footer>
+
+        <script src="js/app.js"></script>
+    </body>
+</html>
